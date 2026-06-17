@@ -1,15 +1,14 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="manifest.json">
-    
     <meta name="theme-color" content="#2c3e50">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1005/1005141.png">
-
+    <link class="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1005/1005141.png">
     <title>Bảng Điều Khiển Hệ Thống NetSchool</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; }
@@ -37,8 +36,13 @@
         button:active { transform: scale(0.95); }
         button:disabled { cursor: not-allowed; opacity: 0.5; }
         
-        .btn-open { background-color: #007bff; grid-column: span 2; font-size: 16px; padding: 15px; } 
+        .btn-open { background-color: #007bff; grid-column: span 2; font-size: 16px; padding: 15px; }
         .btn-open:hover:not(:disabled) { background-color: #0056b3; }
+        
+        /* CSS CHO NÚT KÍCH NHANH MỚI THÊM */
+        .btn-quick { background-color: #17a2b8; grid-column: span 2; font-size: 15px; padding: 12px; margin-top: -2px; }
+        .btn-quick:hover:not(:disabled) { background-color: #138496; }
+        
         .btn-off { background-color: #dc3545; }
         .btn-off:hover:not(:disabled) { background-color: #c82333; }
         .btn-restart { background-color: #ffc107; color: #212529; }
@@ -46,7 +50,11 @@
         .btn-sleep { background-color: #6c757d; }
         .btn-sleep:hover:not(:disabled) { background-color: #5a6268; }
 
-        /* POPUP MODAL */
+        /* CSS CHO NÚT HẸN GIỜ MỚI */
+        .btn-timer { background-color: #e67e22; }
+        .btn-timer:hover:not(:disabled) { background-color: #d35400; }
+
+        /* POPUP MODAL GỐC */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
         .modal-box { background: white; width: 400px; padding: 25px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
         .modal-title { font-size: 18px; font-weight: bold; color: #333; margin-bottom: 15px; text-align: center; border-bottom: 2px solid #eee; padding-bottom: 10px; }
@@ -63,14 +71,35 @@
         .modal-status { text-align: center; margin-top: 15px; font-size: 14px; font-weight: bold; color: #ff9800; min-height: 20px; }
         .btn-close-modal { width: 100%; background: #6c757d; margin-top: 15px; padding: 12px; display: none; }
 
+        /* CSS BỔ SUNG CHO FORM POPUP HẸN GIỜ HIỆN ĐẠI */
+        .form-group { margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 14px; font-weight: bold; color: #2c3e50; }
+        .form-control { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; font-family: inherit; }
+        .form-control:focus { border-color: #e67e22; outline: none; box-shadow: 0 0 5px rgba(230,126,34,0.3); }
+        .modal-footer-btns { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-modal-confirm { background-color: #28a745; flex: 1; padding: 12px; font-weight: bold; }
+        .btn-modal-confirm:hover { background-color: #218838; }
+        .btn-modal-cancel { background-color: #6c757d; flex: 1; padding: 12px; font-weight: bold; }
+        .btn-modal-cancel:hover { background-color: #5a6268; }
+
+        /* EFFECT CHẤM TRÒN NHẤP NHÁY HIỆN ĐẠI CHO MODAL TẮT/RESET/NGỦ */
+        .loading-dots { display: flex; justify-content: center; gap: 8px; margin: 20px 0; }
+        .dot { width: 12px; height: 12px; background-color: #e74c3c; border-radius: 50%; animation: pulseDots 1.2s infinite ease-in-out both; }
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes pulseDots {
+            0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
         @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-
     <h1>🖥️ BẢNG ĐIỀU KHIỂN HỆ THỐNG</h1>
     
     <div class="sys-info-panel" id="sys-info-panel">
+        <div class="sys-stat"><span>Giờ Hiện Tại</span><span id="sys-time" style="color: #ffcc00;">00:00:00</span></div>
         <div class="sys-stat"><span>Chip MCU</span><span id="sys-chip">Đang tải...</span></div>
         <div class="sys-stat"><span>Nhiệt Độ CPU</span><span id="sys-temp">-- °C</span></div>
         <div class="sys-stat"><span>IP Nội Bộ</span><span id="sys-local-ip">--.--.--.--</span></div>
@@ -79,12 +108,12 @@
     </div>
 
     <div class="grid-container" id="pc-container">
-        </div>
+    </div>
 
     <div class="modal-overlay" id="boot-modal">
         <div class="modal-box">
             <div class="modal-title" id="modal-pc-name">Đang khởi động PC...</div>
-            <ul class="step-list">
+            <ul class="step-list" id="modal-step-list">
                 <li class="step-item" id="step-1">Bước 1: Kích nguồn lần đầu (0.5s)</li>
                 <li class="step-item" id="step-2">Bước 2: Đợi Mainboard nạp BIOS (10s)</li>
                 <li class="step-item" id="step-3">Bước 3: Đè nút ép tắt máy (5s)</li>
@@ -93,6 +122,48 @@
             </ul>
             <div class="modal-status" id="modal-status-text">Đang chuẩn bị gửi lệnh...</div>
             <button class="btn-close-modal" id="btn-close-modal" onclick="closeModal()">ĐÓNG BẢNG NÀY</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="timer-modal">
+        <div class="modal-box">
+            <div class="modal-title" id="timer-modal-title">⏱️ THIẾT LẬP HẸN GIỜ</div>
+            
+            <div class="form-group">
+                <label for="timer-action">Hành động thực hiện:</label>
+                <select class="form-control" id="timer-action">
+                    <option value="OFF">Tắt Máy (Shutdown)</option>
+                    <option value="RESTART">Khởi Động Lại (Restart)</option>
+                    <option value="SLEEP">Chế độ Ngủ (Sleep)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="timer-duration">Thời gian chờ (Phút):</label>
+                <input type="number" class="form-control" id="timer-duration" value="30" min="1" max="1440">
+            </div>
+
+            <div class="modal-status" id="timer-status-text" style="min-height: auto; margin-top: 5px;"></div>
+
+            <div class="modal-footer-btns">
+                <button class="btn-modal-confirm" onclick="submitTimerCommand()">XÁC NHẬN LỆNH</button>
+                <button class="btn-modal-cancel" onclick="closeTimerModal()">HỦY BỎ</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="power-modal">
+        <div class="modal-box" style="text-align: center;">
+            <div class="modal-title" id="power-modal-title">ĐANG THỰC HIỆN LỆNH</div>
+            
+            <div class="loading-dots" id="power-loading-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+            
+            <div class="modal-status" id="power-status-text">Đang truyền tải tín hiệu đến hệ thống...</div>
+            <button class="btn-modal-confirm" id="btn-close-power-modal" onclick="closePowerModal()" style="display: none; width: 100%; margin-top: 15px;">OK</button>
         </div>
     </div>
 
@@ -107,7 +178,21 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let activeMacForModal = ""; // Theo dõi máy nào đang mở modal
+        let activeMacForModal = ""; 
+        let activeMacForTimer = ""; 
+        
+        // BIẾN TOÀN CỤC CHỐNG SPAM CLICK (CHỈ GỬI LỆNH 1 LẦN DUY NHẤT)
+        let processingMacs = {}; 
+        let isSubmittingTimer = false;
+        
+        // HÀM TỰ ĐỘNG CẬP NHẬT GIỜ HIỆN TẠI MỖI GIÂY
+        function startLiveClock() {
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('sys-time').innerText = now.toLocaleTimeString('vi-VN');
+            }, 1000);
+        }
+        startLiveClock();
 
         // 2. LẮNG NGHE THÔNG TIN HỆ THỐNG ESP32 (SYS_INFO)
         db.ref('sys_info').on('value', (snapshot) => {
@@ -121,45 +206,159 @@
             }
         });
 
-        // 3. HÀM GỬI LỆNH LÊN FIREBASE
+        // 3. HÀM GỬI LỆNH LÊN FIREBASE (ĐÃ TÍCH HỢP CHỐNG SPAM VÀ TRẢ VỀ 0)
         function sendCommand(macKey, command, pcName) {
-            // Khi bấm OPEN, set boot_step = 0 (Đợi ESP32 phản hồi)
+            // NẾU ĐANG TRONG QUÁ TRÌNH XỬ LÝ -> CHẶN KHÔNG CHO GỬI LỆNH LẦN 2 BẤT CHẤP VIỆC SPAM CLICK
+            if (processingMacs[macKey]) {
+                console.log("Hệ thống đang xử lý lệnh, vui lòng không click liên tục...");
+                return;
+            }
+            // KHÓA TRẠNG THÁI
+            processingMacs[macKey] = true;
+
             let updates = { command: command };
             if (command === 'OPEN') {
                 updates.boot_step = 0; 
                 activeMacForModal = macKey;
-                openModalUI(pcName);
+                openModalUI(pcName, false);
+            }
+            if (command === 'QUICK_OPEN') {
+                updates.boot_step = 0;
+                activeMacForModal = macKey;
+                openModalUI(pcName, true);
+            }
+            
+            // XỬ LÝ POPUP HIỆN ĐẠI CHO LỆNH: TẮT MÁY, RESET, NGỦ (Truyền thêm macKey để có thể reset về 0)
+            if (command === 'OFF' || command === 'RESTART' || command === 'SLEEP') {
+                openPowerModal(pcName, command, macKey);
             }
 
             db.ref('devices/' + macKey).update(updates).then(() => {
                 console.log(`Đã gửi lệnh [${command}] tới MAC: ${macKey}`);
             }).catch((error) => {
-                alert("Lỗi khi gửi lệnh: " + error);
+                console.error("Lỗi khi gửi lệnh: " + error);
+                // NẾU LỖI MẠNG -> MỞ KHÓA LẠI ĐỂ USER CLICK LẠI ĐƯỢC
+                delete processingMacs[macKey]; 
             });
         }
 
         // 4. LOGIC MỞ MODAL BAN ĐẦU
-        function openModalUI(pcName) {
+        function openModalUI(pcName, isQuick) {
             const modal = document.getElementById('boot-modal');
+            const stepList = document.getElementById('modal-step-list');
             document.getElementById('modal-pc-name').innerText = "Đang khởi động: " + pcName;
             document.getElementById('modal-status-text').innerText = "Đang kết nối với ESP32...";
             document.getElementById('modal-status-text').style.color = "#ff9800";
             document.getElementById('btn-close-modal').style.display = "none";
             
-            // Reset toàn bộ CSS về trạng thái chờ
-            for (let i = 1; i <= 5; i++) {
-                document.getElementById('step-' + i).className = 'step-item';
+            if (isQuick) {
+                stepList.style.display = "none"; 
+            } else {
+                stepList.style.display = "block";
+                for (let i = 1; i <= 5; i++) {
+                    document.getElementById('step-' + i).className = 'step-item';
+                }
             }
             modal.style.display = "flex";
         }
 
         function closeModal() {
             document.getElementById('boot-modal').style.display = "none";
-            // Cập nhật lại db để ẩn modal vào lần sau
             if(activeMacForModal) {
-                db.ref('devices/' + activeMacForModal).update({ boot_step: 0 });
-                activeMacForModal = "";
+                // KHI USER CHỦ ĐỘNG TẮT BẢNG -> TRẢ LỆNH VÀ BOOT_STEP VỀ 0 NGAY LẬP TỨC VÀ MỞ KHÓA
+                db.ref('devices/' + activeMacForModal).update({ boot_step: 0, command: 0 }).then(() => {
+                    delete processingMacs[activeMacForModal];
+                    activeMacForModal = "";
+                });
             }
+        }
+
+        // LOGIC ĐIỀU KHIỂN POPUP HẸN GIỜ MỚI
+        function openTimerModal(macKey, pcName) {
+            activeMacForTimer = macKey;
+            document.getElementById('timer-modal-title').innerText = "⏱️ HẸN GIỜ: " + pcName;
+            document.getElementById('timer-status-text').innerText = "";
+            document.getElementById('timer-duration').value = "30";
+            document.getElementById('timer-modal').style.display = "flex";
+        }
+
+        function closeTimerModal() {
+            document.getElementById('timer-modal').style.display = "none";
+            activeMacForTimer = "";
+        }
+
+        function submitTimerCommand() {
+            // CHỐNG SPAM CLICK Ở NÚT HẸN GIỜ
+            if (!activeMacForTimer || isSubmittingTimer) return;
+            isSubmittingTimer = true;
+            
+            const action = document.getElementById('timer-action').value;
+            const minutes = parseInt(document.getElementById('timer-duration').value) || 30;
+            const statusText = document.getElementById('timer-status-text');
+
+            statusText.style.color = "#007bff";
+            statusText.innerText = "Đang thiết lập lệnh hẹn giờ...";
+
+            db.ref('devices/' + activeMacForTimer).update({
+                timer_command: action,
+                timer_minutes: minutes,
+                timer_status: "pending"
+            }).then(() => {
+                statusText.style.color = "#28a745";
+                statusText.innerText = "✓ Đã đặt lịch thành công!";
+                setTimeout(() => {
+                    closeTimerModal();
+                    isSubmittingTimer = false; // Mở khóa
+                }, 1000);
+            }).catch((error) => {
+                statusText.style.color = "#dc3545";
+                statusText.innerText = "Lỗi: " + error.message;
+                isSubmittingTimer = false; // Mở khóa
+            });
+        }
+
+        // LOGIC HIỂN THỊ POPUP NHẤP NHÁY 3S CHO TẮT/RESET/NGỦ
+        function openPowerModal(pcName, command, macKey) {
+            const modal = document.getElementById('power-modal');
+            const title = document.getElementById('power-modal-title');
+            const status = document.getElementById('power-status-text');
+            const dots = document.getElementById('power-loading-dots');
+            const okBtn = document.getElementById('btn-close-power-modal');
+
+            let actionName = "";
+            let accentColor = "#dc3545"; 
+            
+            if (command === 'OFF') { actionName = "TẮT MÁY"; accentColor = "#dc3545"; }
+            if (command === 'RESTART') { actionName = "KHỞI ĐỘNG LẠI"; accentColor = "#ffc107"; }
+            if (command === 'SLEEP') { actionName = "NGỦ (SLEEP)"; accentColor = "#6c757d"; }
+
+            const allDots = dots.querySelectorAll('.dot');
+            allDots.forEach(d => d.style.backgroundColor = accentColor);
+
+            title.innerText = `LỆNH: ${actionName}`;
+            status.innerText = `Đang gửi yêu cầu đến máy ${pcName}...`;
+            status.style.color = "#333";
+            
+            dots.style.display = "flex";
+            okBtn.style.display = "none";
+            modal.style.display = "flex";
+
+            // SAU 3 GIÂY NHẤP NHÁY -> HIỂN THỊ NÚT OK, TRẢ VỀ 0 NGAY LẬP TỨC & MỞ KHÓA CLICK
+            setTimeout(() => {
+                dots.style.display = "none";
+                status.innerText = `✓ Đã thực thi lệnh ${actionName} thành công!`;
+                status.style.color = "#28a745";
+                okBtn.style.display = "block";
+
+                // THỰC HIỆN XONG TRẢ VỀ 0 NGAY TRÊN FIREBASE
+                db.ref('devices/' + macKey).update({ command: 0 }).then(() => {
+                    delete processingMacs[macKey]; // Giải phóng khóa chống click
+                });
+            }, 3000);
+        }
+
+        function closePowerModal() {
+            document.getElementById('power-modal').style.display = "none";
         }
 
         // 5. LẮNG NGHE DỮ LIỆU THỰC TẾ & CẬP NHẬT MODAL TỪ ESP32
@@ -182,7 +381,6 @@
                         const step = pcInfo.boot_step || 0;
                         const statusEl = document.getElementById('modal-status-text');
 
-                        // Cập nhật các bước (1 đến 5)
                         for (let i = 1; i <= 5; i++) {
                             const stepEl = document.getElementById('step-' + i);
                             if (i < step) stepEl.className = 'step-item done';
@@ -190,24 +388,33 @@
                             else stepEl.className = 'step-item';
                         }
 
-                        // Cập nhật text báo cáo
                         if (step === 1) statusEl.innerText = "ESP32 đã nhận lệnh! Bắt đầu chập mạch...";
                         if (step === 2) statusEl.innerText = "Đang chờ mainboard báo lỗi F1/F2...";
                         if (step === 3) statusEl.innerText = "Đang ép tắt nguồn...";
                         if (step === 4) statusEl.innerText = "Đang xả điện chờ chu trình mới...";
                         if (step === 5) statusEl.innerText = "Đang kích nguồn lần 2...";
+                        
+                        if (step === 7) {
+                            statusEl.innerText = "⚡ ESP32 đang chập mạch kích nguồn nhanh 1 lần (0.5s)...";
+                            statusEl.style.color = "#17a2b8";
+                        }
+                        
                         if (step === 6) {
                             statusEl.innerText = "ESP32 đã kích xong! Đợi App Python Online...";
                             statusEl.style.color = "#007bff";
                         }
 
-                        // Khi Python App đã chạy và Ping thành công
+                        // KHỞI ĐỘNG XONG -> PC ONLINE -> BÁO THÀNH CÔNG VÀ TRẢ LỆNH VỀ 0 NGAY
                         if (isOnline) {
                             statusEl.innerText = "🎉 PC ĐÃ ONLINE THÀNH CÔNG!";
                             statusEl.style.color = "#28a745";
                             document.getElementById('btn-close-modal').style.display = "block";
-                            // Tự động clear trạng thái boot_step để không dính popup lần sau
-                            db.ref('devices/' + macKey).update({ boot_step: 0 });
+                            
+                            // THỰC HIỆN XONG TRẢ BOOT_STEP VÀ COMMAND VỀ 0 NGAY LẬP TỨC
+                            db.ref('devices/' + macKey).update({ boot_step: 0, command: 0 }).then(() => {
+                                delete processingMacs[macKey]; // Giải phóng khóa click
+                            });
+                            activeMacForModal = "";
                         }
                     }
 
@@ -223,9 +430,15 @@
                                     ⚡ MỞ MÁY (CHU TRÌNH CỨNG)
                                 </button>
                                 
+                                <button class="btn-quick" onclick="sendCommand('${macKey}', 'QUICK_OPEN', '${pcInfo.name}')" ${isOnline ? 'disabled' : ''}>
+                                    ⚡ KÍCH NHANH (1 LẦN)
+                                </button>
+                                
                                 <button class="btn-off" onclick="sendCommand('${macKey}', 'OFF', '${pcInfo.name}')" ${!isOnline ? 'disabled' : ''}>Tắt Máy</button>
                                 <button class="btn-restart" onclick="sendCommand('${macKey}', 'RESTART', '${pcInfo.name}')" ${!isOnline ? 'disabled' : ''}>Khởi Động Lại</button>
                                 <button class="btn-sleep" onclick="sendCommand('${macKey}', 'SLEEP', '${pcInfo.name}')" ${!isOnline ? 'disabled' : ''}>Ngủ (Sleep)</button>
+                                
+                                <button class="btn-timer" onclick="openTimerModal('${macKey}', '${pcInfo.name}')" ${!isOnline ? 'disabled' : ''}>⏱️ Hẹn Giờ</button>
                             </div>
                         </div>
                     `;
