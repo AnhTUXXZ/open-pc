@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    
+    <meta name="theme-color" content="#2c3e50">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1005/1005141.png">
+
+    <title>Bảng Điều Khiển Hệ Thống NetSchool</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; }
+        h1 { text-align: center; color: #333; margin-bottom: 10px; }
+        
+        .sys-info-panel { background: #2c3e50; color: white; border-radius: 8px; padding: 15px 20px; margin: 0 auto 30px auto; max-width: 900px; display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .sys-stat { display: flex; flex-direction: column; align-items: center; }
+        .sys-stat span:first-child { font-size: 12px; color: #adb5bd; text-transform: uppercase; letter-spacing: 1px; }
+        .sys-stat span:last-child { font-size: 16px; font-weight: bold; margin-top: 5px; color: #00d2ff; }
+
+        .grid-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+        
+        .pc-card { background: white; border-radius: 10px; padding: 20px; width: 300px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-top: 4px solid #ccc; transition: 0.3s; }
+        .pc-card.online { border-top-color: #28a745; }
+        .pc-card.offline { border-top-color: #dc3545; }
+        
+        .pc-name { font-size: 20px; font-weight: bold; margin-bottom: 5px; color: #2c3e50; }
+        .pc-ip { color: #666; font-size: 14px; margin-bottom: 15px; }
+        .status-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; color: white; }
+        .online .status-badge { background-color: #28a745; }
+        .offline .status-badge { background-color: #dc3545; }
+        
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        button { padding: 10px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
+        button:active { transform: scale(0.95); }
+        button:disabled { cursor: not-allowed; opacity: 0.5; }
+        
+        .btn-open { background-color: #007bff; grid-column: span 2; font-size: 16px; padding: 15px; } 
+        .btn-open:hover:not(:disabled) { background-color: #0056b3; }
+        .btn-off { background-color: #dc3545; }
+        .btn-off:hover:not(:disabled) { background-color: #c82333; }
+        .btn-restart { background-color: #ffc107; color: #212529; }
+        .btn-restart:hover:not(:disabled) { background-color: #e0a800; }
+        .btn-sleep { background-color: #6c757d; }
+        .btn-sleep:hover:not(:disabled) { background-color: #5a6268; }
+
+        /* POPUP MODAL */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-box { background: white; width: 400px; padding: 25px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .modal-title { font-size: 18px; font-weight: bold; color: #333; margin-bottom: 15px; text-align: center; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        
+        .step-list { list-style: none; padding: 0; margin: 0; }
+        .step-item { padding: 10px 0; font-size: 14px; color: #666; display: flex; align-items: center; border-bottom: 1px dashed #eee; transition: 0.3s; }
+        .step-item::before { content: '⏳'; margin-right: 10px; font-size: 16px; opacity: 0.5; }
+        
+        .step-item.active { color: #007bff; font-weight: bold; }
+        .step-item.active::before { content: '⚙️'; opacity: 1; animation: spin 2s linear infinite; }
+        .step-item.done { color: #28a745; text-decoration: line-through; }
+        .step-item.done::before { content: '✅'; opacity: 1; text-decoration: none; display: inline-block; }
+
+        .modal-status { text-align: center; margin-top: 15px; font-size: 14px; font-weight: bold; color: #ff9800; min-height: 20px; }
+        .btn-close-modal { width: 100%; background: #6c757d; margin-top: 15px; padding: 12px; display: none; }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <h1>🖥️ BẢNG ĐIỀU KHIỂN HỆ THỐNG</h1>
+    
+    <div class="sys-info-panel" id="sys-info-panel">
+        <div class="sys-stat"><span>Chip MCU</span><span id="sys-chip">Đang tải...</span></div>
+        <div class="sys-stat"><span>Nhiệt Độ CPU</span><span id="sys-temp">-- °C</span></div>
+        <div class="sys-stat"><span>IP Nội Bộ</span><span id="sys-local-ip">--.--.--.--</span></div>
+        <div class="sys-stat"><span>IP Public</span><span id="sys-public-ip">--.--.--.--</span></div>
+        <div class="sys-stat"><span>Khu Vực</span><span id="sys-location">Đang tải...</span></div>
+    </div>
+
+    <div class="grid-container" id="pc-container">
+        </div>
+
+    <div class="modal-overlay" id="boot-modal">
+        <div class="modal-box">
+            <div class="modal-title" id="modal-pc-name">Đang khởi động PC...</div>
+            <ul class="step-list">
+                <li class="step-item" id="step-1">Bước 1: Kích nguồn lần đầu (0.5s)</li>
+                <li class="step-item" id="step-2">Bước 2: Đợi Mainboard nạp BIOS (10s)</li>
+                <li class="step-item" id="step-3">Bước 3: Đè nút ép tắt máy (5s)</li>
+                <li class="step-item" id="step-4">Bước 4: Chờ xả hết điện (5s)</li>
+                <li class="step-item" id="step-5">Bước 5: Kích nguồn Bypass thành công! (0.5s)</li>
+            </ul>
+            <div class="modal-status" id="modal-status-text">Đang chuẩn bị gửi lệnh...</div>
+            <button class="btn-close-modal" id="btn-close-modal" onclick="closeModal()">ĐÓNG BẢNG NÀY</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script>
+        // 1. CẤU HÌNH FIREBASE
+        const firebaseConfig = {
+            databaseURL: "https://checkipat-default-rtdb.firebaseio.com"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let activeMacForModal = ""; // Theo dõi máy nào đang mở modal
+
+        // 2. LẮNG NGHE THÔNG TIN HỆ THỐNG ESP32 (SYS_INFO)
+        db.ref('sys_info').on('value', (snapshot) => {
+            const sysData = snapshot.val();
+            if (sysData) {
+                document.getElementById('sys-chip').innerText = sysData.chip_model || 'Unknown';
+                document.getElementById('sys-temp').innerText = sysData.cpu_temp || '-- °C';
+                document.getElementById('sys-local-ip').innerText = sysData.local_ip || '--.--.--.--';
+                document.getElementById('sys-public-ip').innerText = sysData.public_ip || '--.--.--.--';
+                document.getElementById('sys-location').innerText = sysData.location || 'Unknown';
+            }
+        });
+
+        // 3. HÀM GỬI LỆNH LÊN FIREBASE
+        function sendCommand(macKey, command, pcName) {
+            // Khi bấm OPEN, set boot_step = 0 (Đợi ESP32 phản hồi)
+            let updates = { command: command };
+            if (command === 'OPEN') {
+                updates.boot_step = 0; 
+                activeMacForModal = macKey;
+                openModalUI(pcName);
+            }
+
+            db.ref('devices/' + macKey).update(updates).then(() => {
+                console.log(`Đã gửi lệnh [${command}] tới MAC: ${macKey}`);
+            }).catch((error) => {
+                alert("Lỗi khi gửi lệnh: " + error);
+            });
+        }
+
+        // 4. LOGIC MỞ MODAL BAN ĐẦU
+        function openModalUI(pcName) {
+            const modal = document.getElementById('boot-modal');
+            document.getElementById('modal-pc-name').innerText = "Đang khởi động: " + pcName;
+            document.getElementById('modal-status-text').innerText = "Đang kết nối với ESP32...";
+            document.getElementById('modal-status-text').style.color = "#ff9800";
+            document.getElementById('btn-close-modal').style.display = "none";
+            
+            // Reset toàn bộ CSS về trạng thái chờ
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById('step-' + i).className = 'step-item';
+            }
+            modal.style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById('boot-modal').style.display = "none";
+            // Cập nhật lại db để ẩn modal vào lần sau
+            if(activeMacForModal) {
+                db.ref('devices/' + activeMacForModal).update({ boot_step: 0 });
+                activeMacForModal = "";
+            }
+        }
+
+        // 5. LẮNG NGHE DỮ LIỆU THỰC TẾ & CẬP NHẬT MODAL TỪ ESP32
+        const container = document.getElementById('pc-container');
+
+        db.ref('devices').on('value', (snapshot) => {
+            const data = snapshot.val();
+            let htmlContent = '';
+
+            if (data) {
+                for (const [macKey, pcInfo] of Object.entries(data)) {
+                    const isOnline = pcInfo.status === 'online';
+                    const statusClass = isOnline ? 'online' : 'offline';
+                    const statusText = isOnline ? 'ĐANG CHẠY' : 'ĐÃ TẮT';
+                    
+                    // ==========================================
+                    // XỬ LÝ TRẠNG THÁI POPUP ĐỒNG BỘ VỚI ESP32
+                    // ==========================================
+                    if (macKey === activeMacForModal && document.getElementById('boot-modal').style.display === "flex") {
+                        const step = pcInfo.boot_step || 0;
+                        const statusEl = document.getElementById('modal-status-text');
+
+                        // Cập nhật các bước (1 đến 5)
+                        for (let i = 1; i <= 5; i++) {
+                            const stepEl = document.getElementById('step-' + i);
+                            if (i < step) stepEl.className = 'step-item done';
+                            else if (i === step) stepEl.className = 'step-item active';
+                            else stepEl.className = 'step-item';
+                        }
+
+                        // Cập nhật text báo cáo
+                        if (step === 1) statusEl.innerText = "ESP32 đã nhận lệnh! Bắt đầu chập mạch...";
+                        if (step === 2) statusEl.innerText = "Đang chờ mainboard báo lỗi F1/F2...";
+                        if (step === 3) statusEl.innerText = "Đang ép tắt nguồn...";
+                        if (step === 4) statusEl.innerText = "Đang xả điện chờ chu trình mới...";
+                        if (step === 5) statusEl.innerText = "Đang kích nguồn lần 2...";
+                        if (step === 6) {
+                            statusEl.innerText = "ESP32 đã kích xong! Đợi App Python Online...";
+                            statusEl.style.color = "#007bff";
+                        }
+
+                        // Khi Python App đã chạy và Ping thành công
+                        if (isOnline) {
+                            statusEl.innerText = "🎉 PC ĐÃ ONLINE THÀNH CÔNG!";
+                            statusEl.style.color = "#28a745";
+                            document.getElementById('btn-close-modal').style.display = "block";
+                            // Tự động clear trạng thái boot_step để không dính popup lần sau
+                            db.ref('devices/' + macKey).update({ boot_step: 0 });
+                        }
+                    }
+
+                    // Tái tạo HTML
+                    htmlContent += `
+                        <div class="pc-card ${statusClass}">
+                            <div class="pc-name">${pcInfo.name}</div>
+                            <div class="pc-ip">IP: ${pcInfo.ip} | MAC: ${macKey}</div>
+                            <div class="status-badge">${statusText}</div>
+                            
+                            <div class="btn-group">
+                                <button class="btn-open" onclick="sendCommand('${macKey}', 'OPEN', '${pcInfo.name}')" ${isOnline ? 'disabled' : ''}>
+                                    ⚡ MỞ MÁY (CHU TRÌNH CỨNG)
+                                </button>
+                                
+                                <button class="btn-off" onclick="sendCommand('${macKey}', 'OFF', '${pcInfo.name}')" ${!isOnline ? 'disabled' : ''}>Tắt Máy</button>
+                                <button class="btn-restart" onclick="sendCommand('${macKey}', 'RESTART', '${pcInfo.name}')" ${!isOnline ? 'disabled' : ''}>Khởi Động Lại</button>
+                                <button class="btn-sleep" onclick="sendCommand('${macKey}', 'SLEEP', '${pcInfo.name}')" ${!isOnline ? 'disabled' : ''}>Ngủ (Sleep)</button>
+                            </div>
+                        </div>
+                    `;
+                }
+                container.innerHTML = htmlContent;
+            } else {
+                container.innerHTML = '<p>Chưa có dữ liệu thiết bị trên Firebase.</p>';
+            }
+        });
+
+        // ==========================================
+        // SCRIPT BẮT BUỘC: ĐĂNG KÝ SERVICE WORKER ĐỂ KÍCH HOẠT PWA APP
+        // ==========================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((reg) => console.log('PWA Service Worker đăng ký thành công!', reg))
+                    .catch((err) => console.log('Lỗi đăng ký Service Worker:', err));
+            });
+        }
+    </script>
+</body>
+</html>
