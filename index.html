@@ -4,124 +4,267 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2c3e50">
+    <meta name="theme-color" content="#1e293b">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- ÉP NHẬN FAVICON TỪ GITHUB PAGES -->
+    <link rel="icon" type="image/x-icon" href="https://anhtuxxz.github.io/open-pc/iconIoT.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="https://anhtuxxz.github.io/open-pc/iconIoT.ico">
     <link class="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1005/1005141.png">
-    <title>Bảng Điều Khiển Hệ Thống NetSchool</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <title>Application Remote Pc - Bảng Điều Khiển Hệ Thống</title>
+    
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; }
-        h1 { text-align: center; color: #333; margin-bottom: 10px; }
-        
-        .sys-info-panel { background: #2c3e50; color: white; border-radius: 8px; padding: 15px 20px; margin: 0 auto 30px auto; max-width: 900px; display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .sys-stat { display: flex; flex-direction: column; align-items: center; }
-        .sys-stat span:first-child { font-size: 12px; color: #adb5bd; text-transform: uppercase; letter-spacing: 1px; }
-        .sys-stat span:last-child { font-size: 16px; font-weight: bold; margin-top: 5px; color: #00d2ff; }
-
-        .grid-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
-        
-        .pc-card { background: white; border-radius: 10px; padding: 20px; width: 300px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-top: 4px solid #ccc; transition: 0.3s; }
-        .pc-card.online { border-top-color: #28a745; }
-        .pc-card.offline { border-top-color: #dc3545; }
-        
-        .pc-name { font-size: 20px; font-weight: bold; margin-bottom: 5px; color: #2c3e50; }
-        .pc-ip { color: #666; font-size: 14px; margin-bottom: 15px; }
-        .status-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; color: white; }
-        .online .status-badge { background-color: #28a745; }
-        .offline .status-badge { background-color: #dc3545; }
-        
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        button { padding: 10px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
-        button:active { transform: scale(0.95); }
-        button:disabled { cursor: not-allowed; opacity: 0.5; }
-        
-        .btn-open { background-color: #007bff; grid-column: span 2; font-size: 16px; padding: 15px; }
-        .btn-open:hover:not(:disabled) { background-color: #0056b3; }
-        
-        .btn-quick { background-color: #17a2b8; grid-column: span 2; font-size: 15px; padding: 12px; margin-top: -2px; }
-        .btn-quick:hover:not(:disabled) { background-color: #138496; }
-        
-        .btn-off { background-color: #dc3545; }
-        .btn-off:hover:not(:disabled) { background-color: #c82333; }
-        .btn-restart { background-color: #ffc107; color: #212529; }
-        .btn-restart:hover:not(:disabled) { background-color: #e0a800; }
-        .btn-sleep { background-color: #6c757d; }
-        .btn-sleep:hover:not(:disabled) { background-color: #5a6268; }
-
-        .btn-timer { background-color: #e67e22; }
-        .btn-timer:hover:not(:disabled) { background-color: #d35400; }
-
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-box { background: white; width: 400px; padding: 25px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        .modal-title { font-size: 18px; font-weight: bold; color: #333; margin-bottom: 15px; text-align: center; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        
-        .step-list { list-style: none; padding: 0; margin: 0; }
-        .step-item { padding: 10px 0; font-size: 14px; color: #666; display: flex; align-items: center; border-bottom: 1px dashed #eee; transition: 0.3s; }
-        .step-item::before { content: '⏳'; margin-right: 10px; font-size: 16px; opacity: 0.5; }
-        
-        .step-item.active { color: #007bff; font-weight: bold; }
-        .step-item.active::before { content: '⚙️'; opacity: 1; animation: spin 2s linear infinite; }
-        .step-item.done { color: #28a745; text-decoration: line-through; }
-        .step-item.done::before { content: '✅'; opacity: 1; text-decoration: none; display: inline-block; }
-
-        .modal-status { text-align: center; margin-top: 15px; font-size: 14px; font-weight: bold; color: #ff9800; min-height: 20px; }
-        .btn-close-modal { width: 100%; background: #6c757d; margin-top: 15px; padding: 12px; display: none; }
-
-        .form-group { margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px; }
-        .form-group label { font-size: 14px; font-weight: bold; color: #2c3e50; }
-        .form-control { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; font-family: inherit; }
-        .form-control:focus { border-color: #e67e22; outline: none; box-shadow: 0 0 5px rgba(230,126,34,0.3); }
-        .modal-footer-btns { display: flex; gap: 10px; margin-top: 20px; }
-        .btn-modal-confirm { background-color: #28a745; flex: 1; padding: 12px; font-weight: bold; }
-        .btn-modal-confirm:hover { background-color: #218838; }
-        .btn-modal-cancel { background-color: #6c757d; flex: 1; padding: 12px; font-weight: bold; }
-        .btn-modal-cancel:hover { background-color: #5a6268; }
-
-        .loading-dots { display: flex; justify-content: center; gap: 8px; margin: 20px 0; }
-        .dot { width: 12px; height: 12px; background-color: #e74c3c; border-radius: 50%; animation: pulseDots 1.2s infinite ease-in-out both; }
-        .dot:nth-child(1) { animation-delay: -0.32s; }
-        .dot:nth-child(2) { animation-delay: -0.16s; }
-        @keyframes pulseDots {
-            0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
-            40% { transform: scale(1); opacity: 1; }
+        :root {
+            --bg-color: #f1f5f9;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --card-bg: #ffffff;
+            --primary: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #0ea5e9;
+            --dark: #0f172a;
         }
 
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-main);
+            margin: 0; 
+            padding: 0; 
+        }
+
+        header {
+            background-color: var(--dark);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .logo { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 800; letter-spacing: 0.5px; }
+        .logo i { color: var(--primary); font-size: 24px; }
+        .sys-time { font-family: monospace; font-size: 18px; font-weight: 600; color: #cbd5e1; background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 6px; }
+
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+
+        .section-title {
+            font-size: 18px; font-weight: 700; margin-bottom: 15px; color: var(--text-main);
+            display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .section-title i { color: var(--primary); }
+
+        .esp-gateway {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 12px;
+            padding: 20px 30px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid var(--primary);
+        }
+        .esp-left-content { display: flex; flex-direction: column; gap: 20px; flex: 1; }
+        .esp-info { display: flex; gap: 30px; flex-wrap: wrap; }
+        .esp-stat { display: flex; flex-direction: column; gap: 5px; }
+        .esp-stat span:first-child { font-size: 12px; color: #94a3b8; text-transform: uppercase; font-weight: 600; }
+        .esp-stat span:last-child { font-size: 15px; font-weight: 700; color: #f8fafc; display: flex; align-items: center; gap: 6px; }
+        .esp-stat i { color: var(--info); font-size: 14px; }
+        
+        .esp-status {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #34d399;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            width: fit-content;
+        }
+        .live-dot { width: 10px; height: 10px; background-color: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; animation: blink 1.5s infinite ease-in-out; }
+
+        .esp-right-image { flex-shrink: 0; display: flex; justify-content: center; align-items: center; background: white; padding: 5px; border-radius: 8px; }
+        .esp-right-image img { height: 90px; border-radius: 4px; object-fit: contain; }
+
+        @media (max-width: 600px) {
+            .esp-right-image { width: 100%; justify-content: flex-start; background: transparent; padding: 0; }
+            .esp-right-image img { height: 80px; border-radius: 8px; }
+        }
+
+        .pc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .pc-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .pc-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .pc-card::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--text-muted); transition: 0.3s; }
+        
+        .pc-card.online::before { background: var(--success); }
+        .pc-card.offline::before { background: var(--danger); }
+
+        .pc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .pc-name { font-size: 18px; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+        .pc-name i { color: var(--text-muted); }
+        .pc-card.online .pc-name i { color: var(--primary); }
+        
+        .pc-mac { font-size: 12px; color: var(--text-muted); font-family: monospace; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; margin-top: 5px; display: inline-block;}
+
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 10px; border-radius: 50px; font-size: 12px; font-weight: 700;
+        }
+        .online .status-badge { background-color: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .offline .status-badge { background-color: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .online .status-badge::before { content: ""; width: 8px; height: 8px; background: var(--success); border-radius: 50%; animation: blink 1.5s infinite; }
+        .offline .status-badge::before { content: ""; width: 8px; height: 8px; background: var(--danger); border-radius: 50%; }
+
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        button {
+            padding: 10px; border: none; border-radius: 8px; font-weight: 600; font-size: 13px; font-family: 'Inter', sans-serif;
+            cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; gap: 6px;
+            transition: all 0.2s;
+        }
+        button:active { transform: scale(0.96); }
+        button:disabled { cursor: not-allowed; opacity: 0.5; filter: grayscale(100%); transform: none !important; }
+        
+        .btn-open { background-color: var(--primary); grid-column: span 2; font-size: 15px; padding: 14px; box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3); }
+        .btn-open:hover:not(:disabled) { background-color: #2563eb; }
+        
+        .btn-quick { background-color: var(--info); grid-column: span 2; font-size: 14px; padding: 12px; box-shadow: 0 4px 14px rgba(14, 165, 233, 0.3); }
+        .btn-quick:hover:not(:disabled) { background-color: #0284c7; }
+        
+        .btn-off { background-color: var(--danger); }
+        .btn-off:hover:not(:disabled) { background-color: #dc2626; }
+        
+        .btn-restart { background-color: var(--warning); color: #78350f; }
+        .btn-restart:hover:not(:disabled) { background-color: #d97706; color: white; }
+        
+        .btn-sleep { background-color: var(--text-muted); }
+        .btn-sleep:hover:not(:disabled) { background-color: #475569; }
+
+        .btn-timer { background-color: #8b5cf6; }
+        .btn-timer:hover:not(:disabled) { background-color: #7c3aed; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(4px); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-box { background: white; width: 420px; padding: 25px; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 1px solid #e2e8f0; }
+        .modal-title { font-size: 18px; font-weight: 800; color: var(--text-main); margin-bottom: 20px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        
+        .step-list { list-style: none; padding: 0; margin: 0; background: #f8fafc; border-radius: 8px; padding: 10px; border: 1px solid #e2e8f0; }
+        .step-item { padding: 10px 15px; font-size: 13px; font-weight: 500; color: var(--text-muted); display: flex; align-items: center; transition: 0.3s; border-radius: 6px; }
+        .step-item i { margin-right: 12px; font-size: 16px; width: 20px; text-align: center; }
+        
+        .step-item.active { background: #eff6ff; color: var(--primary); font-weight: 700; }
+        .step-item.active i { animation: spin 2s linear infinite; }
+        .step-item.done { color: var(--success); text-decoration: line-through; opacity: 0.7; }
+
+        .modal-status { text-align: center; margin-top: 20px; font-size: 14px; font-weight: 700; color: var(--warning); min-height: 20px; padding: 10px; background: rgba(245, 158, 11, 0.1); border-radius: 8px; }
+        .btn-close-modal { width: 100%; background: var(--text-muted); margin-top: 15px; padding: 12px; display: none; box-shadow: none; }
+
+        .form-group { margin-bottom: 15px; display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-size: 13px; font-weight: 700; color: var(--text-main); }
+        .form-control { padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; font-family: inherit; transition: 0.2s; }
+        .form-control:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        
+        .modal-footer-btns { display: flex; gap: 10px; margin-top: 25px; }
+        .btn-modal-confirm { background-color: var(--success); flex: 1; }
+        .btn-modal-cancel { background-color: var(--text-muted); flex: 1; }
+
+        .loading-dots { display: flex; justify-content: center; gap: 10px; margin: 25px 0; }
+        .dot { width: 14px; height: 14px; background-color: var(--danger); border-radius: 50%; animation: pulseDots 1.2s infinite ease-in-out both; }
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes pulseDots { 0%, 80%, 100% { transform: scale(0); opacity: 0.3; } 40% { transform: scale(1); opacity: 1; } }
         @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
     </style>
 </head>
 <body>
-    <h1>🖥️ BẢNG ĐIỀU KHIỂN HỆ THỐNG</h1>
     
-    <div class="sys-info-panel" id="sys-info-panel">
-        <div class="sys-stat"><span>Giờ Hiện Tại</span><span id="sys-time" style="color: #ffcc00;">00:00:00</span></div>
-        <div class="sys-stat"><span>Chip MCU</span><span id="sys-chip">Đang tải...</span></div>
-        <div class="sys-stat"><span>Nhiệt Độ CPU</span><span id="sys-temp">-- °C</span></div>
-        <div class="sys-stat"><span>IP Nội Bộ</span><span id="sys-local-ip">--.--.--.--</span></div>
-        <div class="sys-stat"><span>IP Public</span><span id="sys-public-ip">--.--.--.--</span></div>
-        <div class="sys-stat"><span>Khu Vực</span><span id="sys-location">Đang tải...</span></div>
-    </div>
+    <header>
+        <div class="logo">
+            <i class="fas fa-network-wired"></i>
+            Dashboard Manage Pc
+        </div>
+        <div class="sys-time" id="sys-time">00:00:00</div>
+    </header>
 
-    <div class="grid-container" id="pc-container">
+    <div class="container">
+        <div class="section-title"><i class="fas fa-microchip"></i> Trạm Điều Khiển Trung Tâm (Gateway)</div>
+        <div class="esp-gateway">
+            <div class="esp-left-content">
+                <div class="esp-info">
+                    <div class="esp-stat">
+                        <span>Mạch Điều Khiển</span>
+                        <span id="sys-chip"><i class="fas fa-microchip"></i> Đang kết nối...</span>
+                    </div>
+                    <div class="esp-stat">
+                        <span>IP Mạng Nội Bộ (LAN)</span>
+                        <span id="sys-local-ip"><i class="fas fa-network-wired"></i> --.--.--.--</span>
+                    </div>
+                    <div class="esp-stat">
+                        <span>IP Mạng Công Cộng</span>
+                        <span id="sys-public-ip"><i class="fas fa-globe"></i> --.--.--.--</span>
+                    </div>
+                </div>
+                <div class="esp-status">
+                    <div class="live-dot"></div> Đang hoạt động
+                </div>
+            </div>
+            
+            <div class="esp-right-image">
+                <img src="https://www.clex.kz/_next/image?url=https%3A%2F%2Fwww.clex.kz%2Fapi%2Fimages%2Fproducts%2Fnodemcu-esp32-plata-razrabotki-wi-fi-bluetooth-esp-wroom-32-1.jpg&w=3840&q=75" alt="ESP32 Module">
+            </div>
+        </div>
+
+        <div class="section-title"><i class="fas fa-desktop"></i> Danh Sách Máy Tính</div>
+        <div class="pc-grid" id="pc-container">
+        </div>
     </div>
 
     <div class="modal-overlay" id="boot-modal">
         <div class="modal-box">
-            <div class="modal-title" id="modal-pc-name">Đang khởi động PC...</div>
+            <div class="modal-title" id="modal-pc-name"><i class="fas fa-power-off"></i> Khởi động PC</div>
             <ul class="step-list" id="modal-step-list">
-                <li class="step-item" id="step-1">Bước 1: Kích nguồn lần đầu (0.5s)</li>
-                <li class="step-item" id="step-2">Bước 2: Đợi Mainboard nạp BIOS (10s)</li>
-                <li class="step-item" id="step-3">Bước 3: Đè nút ép tắt máy (5s)</li>
-                <li class="step-item" id="step-4">Bước 4: Chờ xả hết điện (5s)</li>
-                <li class="step-item" id="step-5">Bước 5: Kích nguồn Bypass thành công! (0.5s)</li>
+                <li class="step-item" id="step-1"><i class="fas fa-hourglass-half"></i> Bước 1: Kích nguồn (0.5s)</li>
+                <li class="step-item" id="step-2"><i class="fas fa-hourglass-half"></i> Bước 2: Mainboard nạp BIOS (10s)</li>
+                <li class="step-item" id="step-3"><i class="fas fa-hourglass-half"></i> Bước 3: Đè nút ép tắt máy (5s)</li>
+                <li class="step-item" id="step-4"><i class="fas fa-hourglass-half"></i> Bước 4: Chờ xả hết điện (5s)</li>
+                <li class="step-item" id="step-5"><i class="fas fa-hourglass-half"></i> Bước 5: Kích nguồn Bypass! (0.5s)</li>
             </ul>
-            <div class="modal-status" id="modal-status-text">Đang chuẩn bị gửi lệnh...</div>
-            <button class="btn-close-modal" id="btn-close-modal" onclick="closeModal()">ĐÓNG BẢNG NÀY</button>
+            <div class="modal-status" id="modal-status-text">Đang kết nối với ESP32...</div>
+            <button class="btn-close-modal" id="btn-close-modal" onclick="closeModal()">ĐÓNG CỬA SỔ NÀY</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="timer-modal">
         <div class="modal-box">
-            <div class="modal-title" id="timer-modal-title">⏱️ THIẾT LẬP HẸN GIỜ</div>
+            <div class="modal-title" id="timer-modal-title"><i class="fas fa-clock"></i> THIẾT LẬP HẸN GIỜ</div>
             
             <div class="form-group">
                 <label for="timer-action">Hành động thực hiện:</label>
@@ -137,27 +280,25 @@
                 <input type="number" class="form-control" id="timer-duration" value="30" min="1" max="1440">
             </div>
 
-            <div class="modal-status" id="timer-status-text" style="min-height: auto; margin-top: 5px;"></div>
+            <div class="modal-status" id="timer-status-text" style="display:none; background: transparent; padding:0; min-height: auto;"></div>
 
             <div class="modal-footer-btns">
-                <button class="btn-modal-confirm" onclick="submitTimerCommand()">XÁC NHẬN LỆNH</button>
-                <button class="btn-modal-cancel" onclick="closeTimerModal()">HỦY BỎ</button>
+                <button class="btn-modal-confirm" onclick="submitTimerCommand()"><i class="fas fa-check"></i> XÁC NHẬN</button>
+                <button class="btn-modal-cancel" onclick="closeTimerModal()"><i class="fas fa-times"></i> HỦY BỎ</button>
             </div>
         </div>
     </div>
 
     <div class="modal-overlay" id="power-modal">
         <div class="modal-box" style="text-align: center;">
-            <div class="modal-title" id="power-modal-title">ĐANG THỰC HIỆN LỆNH</div>
+            <div class="modal-title" id="power-modal-title" style="justify-content: center;"><i class="fas fa-terminal"></i> THỰC THI LỆNH</div>
             
             <div class="loading-dots" id="power-loading-dots">
-                <div class="dot"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
+                <div class="dot"></div><div class="dot"></div><div class="dot"></div>
             </div>
             
-            <div class="modal-status" id="power-status-text">Đang truyền tải tín hiệu đến hệ thống...</div>
-            <button class="btn-modal-confirm" id="btn-close-power-modal" onclick="closePowerModal()" style="display: none; width: 100%; margin-top: 15px;">OK</button>
+            <div class="modal-status" id="power-status-text" style="background: transparent;">Đang truyền tải tín hiệu...</div>
+            <button class="btn-open" id="btn-close-power-modal" onclick="closePowerModal()" style="display: none; width: 100%; margin-top: 20px;">ĐỒNG Ý</button>
         </div>
     </div>
 
@@ -165,7 +306,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // 1. CẤU HÌNH FIREBASE
         const firebaseConfig = {
             databaseURL: "https://checkipat-default-rtdb.firebaseio.com"
         };
@@ -174,7 +314,6 @@
 
         let activeMacForModal = ""; 
         let activeMacForTimer = ""; 
-        
         let processingMacs = {}; 
         let isSubmittingTimer = false;
         
@@ -189,27 +328,22 @@
         db.ref('sys_info').on('value', (snapshot) => {
             const sysData = snapshot.val();
             if (sysData) {
-                document.getElementById('sys-chip').innerText = sysData.chip_model || 'Unknown';
-                document.getElementById('sys-temp').innerText = sysData.cpu_temp || '-- °C';
-                document.getElementById('sys-local-ip').innerText = sysData.local_ip || '--.--.--.--';
-                document.getElementById('sys-public-ip').innerText = sysData.public_ip || '--.--.--.--';
-                document.getElementById('sys-location').innerText = sysData.location || 'Unknown';
+                document.getElementById('sys-chip').innerHTML = `<i class="fas fa-microchip"></i> ${sysData.chip_model || 'ESP32'}`;
+                document.getElementById('sys-local-ip').innerHTML = `<i class="fas fa-network-wired"></i> ${sysData.local_ip || '--.--.--.--'}`;
+                document.getElementById('sys-public-ip').innerHTML = `<i class="fas fa-globe"></i> ${sysData.public_ip || '--.--.--.--'}`;
             }
         });
 
-        // 3. HÀM GỬI LỆNH (ĐÃ CẬP NHẬT LOGIC TẮT NGUỒN CỨNG)
         function sendCommand(macKey, command, pcName) {
-            if (processingMacs[macKey]) {
-                console.log("Hệ thống đang xử lý lệnh, vui lòng không click liên tục...");
-                return;
-            }
+            if (processingMacs[macKey]) return;
             processingMacs[macKey] = true;
 
             let updates = {};
             
-            // Xử lý riêng cho lệnh Tắt nguồn cứng (gửi vào tatnguon thay vì command)
             if (command === 'OFF') {
-                updates.tatnguon = 1;
+                updates.tatnguon = 1; 
+            } else if (command === 'RESTART') {
+                updates.tatnguon = 2; 
             } else {
                 updates.command = command;
             }
@@ -229,10 +363,7 @@
                 openPowerModal(pcName, command, macKey);
             }
 
-            db.ref('devices/' + macKey).update(updates).then(() => {
-                console.log(`Đã gửi lệnh [${command}] tới MAC: ${macKey}`);
-            }).catch((error) => {
-                console.error("Lỗi khi gửi lệnh: " + error);
+            db.ref('devices/' + macKey).update(updates).catch(() => {
                 delete processingMacs[macKey]; 
             });
         }
@@ -240,9 +371,9 @@
         function openModalUI(pcName, isQuick) {
             const modal = document.getElementById('boot-modal');
             const stepList = document.getElementById('modal-step-list');
-            document.getElementById('modal-pc-name').innerText = "Đang khởi động: " + pcName;
+            document.getElementById('modal-pc-name').innerHTML = `<i class="fas fa-power-off"></i> Khởi động: ${pcName}`;
             document.getElementById('modal-status-text').innerText = "Đang kết nối với ESP32...";
-            document.getElementById('modal-status-text').style.color = "#ff9800";
+            document.getElementById('modal-status-text').style.color = "var(--warning)";
             document.getElementById('btn-close-modal').style.display = "none";
             
             if (isQuick) {
@@ -251,6 +382,7 @@
                 stepList.style.display = "block";
                 for (let i = 1; i <= 5; i++) {
                     document.getElementById('step-' + i).className = 'step-item';
+                    document.getElementById('step-' + i).querySelector('i').className = 'fas fa-hourglass-half';
                 }
             }
             modal.style.display = "flex";
@@ -268,8 +400,8 @@
 
         function openTimerModal(macKey, pcName) {
             activeMacForTimer = macKey;
-            document.getElementById('timer-modal-title').innerText = "⏱️ HẸN GIỜ: " + pcName;
-            document.getElementById('timer-status-text').innerText = "";
+            document.getElementById('timer-modal-title').innerHTML = `<i class="fas fa-clock"></i> HẸN GIỜ: ${pcName}`;
+            document.getElementById('timer-status-text').style.display = "none";
             document.getElementById('timer-duration').value = "30";
             document.getElementById('timer-modal').style.display = "flex";
         }
@@ -287,7 +419,8 @@
             const minutes = parseInt(document.getElementById('timer-duration').value) || 30;
             const statusText = document.getElementById('timer-status-text');
 
-            statusText.style.color = "#007bff";
+            statusText.style.display = "block";
+            statusText.style.color = "var(--info)";
             statusText.innerText = "Đang thiết lập lệnh hẹn giờ...";
 
             db.ref('devices/' + activeMacForTimer).update({
@@ -295,20 +428,19 @@
                 timer_minutes: minutes,
                 timer_status: "pending"
             }).then(() => {
-                statusText.style.color = "#28a745";
+                statusText.style.color = "var(--success)";
                 statusText.innerText = "✓ Đã đặt lịch thành công!";
                 setTimeout(() => {
                     closeTimerModal();
                     isSubmittingTimer = false; 
                 }, 1000);
             }).catch((error) => {
-                statusText.style.color = "#dc3545";
+                statusText.style.color = "var(--danger)";
                 statusText.innerText = "Lỗi: " + error.message;
                 isSubmittingTimer = false; 
             });
         }
 
-        // LOGIC HIỂN THỊ POPUP (ĐÃ TÙY CHỈNH THỜI GIAN CHO ÉP TẮT CỨNG)
         function openPowerModal(pcName, command, macKey) {
             const modal = document.getElementById('power-modal');
             const title = document.getElementById('power-modal-title');
@@ -317,44 +449,46 @@
             const okBtn = document.getElementById('btn-close-power-modal');
 
             let actionName = "";
-            let accentColor = "#dc3545"; 
-            let delayWaitTime = 3000; // Mặc định 3s cho Restart/Sleep
+            let accentColor = "var(--danger)"; 
+            let delayWaitTime = 3000; 
             
-            // Nếu là lệnh TẮT MÁY (Ép cứng), đợi đúng 12s chu trình của ESP32
             if (command === 'OFF') { 
-                actionName = "ÉP TẮT CỨNG"; 
-                accentColor = "#dc3545"; 
-                delayWaitTime = 12000; 
+                actionName = "ÉP TẮT NGUỒN CỨNG"; 
+                accentColor = "var(--danger)"; 
+                delayWaitTime = 7000; 
             }
-            if (command === 'RESTART') { actionName = "KHỞI ĐỘNG LẠI"; accentColor = "#ffc107"; }
-            if (command === 'SLEEP') { actionName = "NGỦ (SLEEP)"; accentColor = "#6c757d"; }
+            if (command === 'RESTART') { 
+                actionName = "RESET CỨNG NGUỒN"; 
+                accentColor = "var(--warning)"; 
+                delayWaitTime = 11000; 
+            }
+            if (command === 'SLEEP') { actionName = "CHẾ ĐỘ NGỦ"; accentColor = "var(--text-muted)"; }
 
             const allDots = dots.querySelectorAll('.dot');
             allDots.forEach(d => d.style.backgroundColor = accentColor);
 
-            title.innerText = `LỆNH: ${actionName}`;
+            title.innerHTML = `<i class="fas fa-terminal"></i> ${actionName}`;
             
             if (command === 'OFF') {
-                status.innerText = `ESP32 đang đè nút nguồn ép tắt máy ${pcName} (12s)...`;
+                status.innerText = `ESP32 đang đè nút nguồn PC ${pcName} 5s...`;
+            } else if (command === 'RESTART') {
+                status.innerText = `ESP32 đang thực thi Reset cứng PC ${pcName} (11s)...`;
             } else {
-                status.innerText = `Đang gửi yêu cầu đến máy ${pcName}...`;
+                status.innerText = `Đang gửi yêu cầu đến ${pcName}...`;
             }
             
-            status.style.color = "#333";
-            
+            status.style.color = "var(--text-muted)";
             dots.style.display = "flex";
             okBtn.style.display = "none";
             modal.style.display = "flex";
 
             setTimeout(() => {
                 dots.style.display = "none";
-                status.innerText = `✓ Đã thực thi lệnh ${actionName} thành công!`;
-                status.style.color = "#28a745";
+                status.innerText = `✓ Đã thực thi lệnh thành công!`;
+                status.style.color = "var(--success)";
                 okBtn.style.display = "block";
 
-                // Chỉ trả command về 0 đối với Restart/Sleep. 
-                // Với lệnh Tắt máy cứng, ESP32 đã tự động trả tatnguon = 0 rồi.
-                if (command !== 'OFF') {
+                if (command === 'SLEEP') {
                     db.ref('devices/' + macKey).update({ command: 0 }).then(() => {
                         delete processingMacs[macKey]; 
                     });
@@ -378,7 +512,7 @@
                 for (const [macKey, pcInfo] of Object.entries(data)) {
                     const isOnline = pcInfo.status === 'online';
                     const statusClass = isOnline ? 'online' : 'offline';
-                    const statusText = isOnline ? 'ĐANG CHẠY' : 'ĐÃ TẮT';
+                    const statusText = isOnline ? 'Đang Chạy' : 'Đã Tắt';
                     
                     if (macKey === activeMacForModal && document.getElementById('boot-modal').style.display === "flex") {
                         const step = pcInfo.boot_step || 0;
@@ -386,9 +520,20 @@
 
                         for (let i = 1; i <= 5; i++) {
                             const stepEl = document.getElementById('step-' + i);
-                            if (i < step) stepEl.className = 'step-item done';
-                            else if (i === step) stepEl.className = 'step-item active';
-                            else stepEl.className = 'step-item';
+                            const iconEl = stepEl.querySelector('i');
+                            
+                            if (i < step) {
+                                stepEl.className = 'step-item done';
+                                iconEl.className = 'fas fa-check-circle';
+                            }
+                            else if (i === step) {
+                                stepEl.className = 'step-item active';
+                                iconEl.className = 'fas fa-cog';
+                            }
+                            else {
+                                stepEl.className = 'step-item';
+                                iconEl.className = 'fas fa-hourglass-half';
+                            }
                         }
 
                         if (step === 1) statusEl.innerText = "ESP32 đã nhận lệnh! Bắt đầu chập mạch...";
@@ -398,18 +543,18 @@
                         if (step === 5) statusEl.innerText = "Đang kích nguồn lần 2...";
                         
                         if (step === 7) {
-                            statusEl.innerText = "⚡ ESP32 đang chập mạch kích nguồn nhanh 1 lần (0.5s)...";
-                            statusEl.style.color = "#17a2b8";
+                            statusEl.innerHTML = "<i class='fas fa-bolt'></i> Đang kích nguồn nhanh (0.5s)...";
+                            statusEl.style.color = "var(--info)";
                         }
                         
                         if (step === 6) {
-                            statusEl.innerText = "ESP32 đã kích xong! Đợi App Python Online...";
-                            statusEl.style.color = "#007bff";
+                            statusEl.innerText = "Đã kích xong! Chờ Windows khởi động...";
+                            statusEl.style.color = "var(--primary)";
                         }
 
                         if (isOnline) {
-                            statusEl.innerText = "🎉 PC ĐÃ ONLINE THÀNH CÔNG!";
-                            statusEl.style.color = "#28a745";
+                            statusEl.innerHTML = "<i class='fas fa-check-circle'></i> MÁY ĐÃ ONLINE THÀNH CÔNG!";
+                            statusEl.style.color = "var(--success)";
                             document.getElementById('btn-close-modal').style.display = "block";
                             
                             db.ref('devices/' + macKey).update({ boot_step: 0, command: 0 }).then(() => {
@@ -421,31 +566,36 @@
 
                     htmlContent += `
                         <div class="pc-card ${statusClass}">
-                            <div class="pc-name">${pcInfo.name}</div>
-                            <div class="pc-ip">IP: ${pcInfo.ip} | MAC: ${macKey}</div>
-                            <div class="status-badge">${statusText}</div>
+                            <div class="pc-header">
+                                <div>
+                                    <div class="pc-name"><i class="fas fa-desktop"></i> ${pcInfo.name}</div>
+                                    <div class="pc-mac">${macKey}</div>
+                                </div>
+                                <div class="status-badge">${statusText}</div>
+                            </div>
+                            
+                            <div class="pc-ip"><i class="fas fa-network-wired" style="color:var(--text-muted); margin-right:5px;"></i> IP: <strong>${pcInfo.ip}</strong></div>
                             
                             <div class="btn-group">
                                 <button class="btn-open" onclick="sendCommand('${macKey}', 'OPEN', '${pcInfo.name}')" ${isOnline ? 'disabled' : ''}>
-                                    ⚡ MỞ MÁY (CHU TRÌNH CỨNG)
+                                    <i class="fas fa-bolt"></i> CHU TRÌNH CỨNG
                                 </button>
                                 
                                 <button class="btn-quick" onclick="sendCommand('${macKey}', 'QUICK_OPEN', '${pcInfo.name}')" ${isOnline ? 'disabled' : ''}>
-                                    ⚡ KÍCH NHANH (1 LẦN)
+                                    <i class="fas fa-power-off"></i> KÍCH NHANH
                                 </button>
                                 
-                                <button class="btn-off" onclick="sendCommand('${macKey}', 'OFF', '${pcInfo.name}')" ${!isOnline ? 'disabled' : ''}>Tắt Máy</button>
-                                <button class="btn-restart" onclick="sendCommand('${macKey}', 'RESTART', '${pcInfo.name}')" ${!isOnline ? 'disabled' : ''}>Khởi Động Lại</button>
-                                <button class="btn-sleep" onclick="sendCommand('${macKey}', 'SLEEP', '${pcInfo.name}')" ${!isOnline ? 'disabled' : ''}>Ngủ (Sleep)</button>
-                                
-                                <button class="btn-timer" onclick="openTimerModal('${macKey}', '${pcInfo.name}')" ${!isOnline ? 'disabled' : ''}>⏱️ Hẹn Giờ</button>
+                                <button class="btn-off" onclick="sendCommand('${macKey}', 'OFF', '${pcInfo.name}')" ${!isOnline ? 'disabled' : ''}><i class="fas fa-power-off"></i> Tắt Máy</button>
+                                <button class="btn-restart" onclick="sendCommand('${macKey}', 'RESTART', '${pcInfo.name}')" ${!isOnline ? 'disabled' : ''}><i class="fas fa-sync-alt"></i> Reset</button>
+                                <button class="btn-sleep" onclick="sendCommand('${macKey}', 'SLEEP', '${pcInfo.name}')" ${!isOnline ? 'disabled' : ''}><i class="fas fa-moon"></i> Sleep</button>
+                                <button class="btn-timer" onclick="openTimerModal('${macKey}', '${pcInfo.name}')" ${!isOnline ? 'disabled' : ''}><i class="fas fa-clock"></i> Hẹn Giờ</button>
                             </div>
                         </div>
                     `;
                 }
                 container.innerHTML = htmlContent;
             } else {
-                container.innerHTML = '<p>Chưa có dữ liệu thiết bị trên Firebase.</p>';
+                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px;"><i class="fas fa-box-open" style="font-size: 40px; margin-bottom: 10px;"></i><br>Chưa có thiết bị nào kết nối lên Firebase.</div>';
             }
         });
 
