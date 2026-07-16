@@ -8,7 +8,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
-    <!-- ÉP NHẬN FAVICON TỪ GITHUB PAGES -->
     <link rel="icon" type="image/x-icon" href="https://anhtuxxz.github.io/open-pc/iconIoT.ico">
     <link rel="shortcut icon" type="image/x-icon" href="https://anhtuxxz.github.io/open-pc/iconIoT.ico">
     <link class="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1005/1005141.png">
@@ -97,29 +96,36 @@
         }
         .live-dot { width: 10px; height: 10px; background-color: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; animation: blink 1.5s infinite ease-in-out; }
 
-       .esp-right-image {
-    width: 480px;
-    height: 160px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+        .esp-right-image {
+            width: 480px;
+            height: 160px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-.esp-right-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    background: transparent;
-}
+        .esp-right-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: transparent;
+        }
 
-        @media (max-width: 600px) {
-            .esp-right-image { width: 100%; justify-content: flex-start; background: transparent; padding: 0; }
-            .esp-right-image img { height: 80px; border-radius: 8px; }
+        /* --- LAYOUT CHIA LÀM 2 BÊN --- */
+        .main-columns {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        @media (min-width: 992px) {
+            .main-columns {
+                grid-template-columns: 1.2fr 0.8fr;
+            }
         }
 
         .pc-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
             gap: 20px;
         }
 
@@ -155,6 +161,85 @@
         .online .status-badge::before { content: ""; width: 8px; height: 8px; background: var(--success); border-radius: 50%; animation: blink 1.5s infinite; }
         .offline .status-badge::before { content: ""; width: 8px; height: 8px; background: var(--danger); border-radius: 50%; }
 
+        /* --- STYLE CHO BÊN ĐIỀU KHIỂN OLED --- */
+        .oled-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .oled-card::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--info);
+        }
+        .oled-btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .btn-mode {
+            background-color: #e2e8f0;
+            color: var(--text-main);
+            border: 1px solid #cbd5e1;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .btn-mode.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+        .btn-mode:hover:not(.active) {
+            background-color: #cbd5e1;
+        }
+        
+        .emotion-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .btn-emotion {
+            background-color: #f8fafc;
+            color: var(--text-main);
+            border: 1px solid #cbd5e1;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 10px;
+        }
+        .btn-emotion.active {
+            background-color: var(--success);
+            color: white;
+            border-color: var(--success);
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+        }
+        .btn-emotion:hover:not(.active) {
+            background-color: #e2e8f0;
+        }
+        .btn-trigger-countdown {
+            background-color: #8b5cf6;
+            font-size: 14px;
+            padding: 14px;
+            box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);
+            width: 100%;
+        }
+        .btn-trigger-countdown:hover {
+            background-color: #7c3aed;
+        }
+
+        /* --- GENERAL BUTTONS --- */
         .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
         button {
             padding: 10px; border: none; border-radius: 8px; font-weight: 600; font-size: 13px; font-family: 'Inter', sans-serif;
@@ -182,6 +267,7 @@
         .btn-timer { background-color: #8b5cf6; }
         .btn-timer:hover:not(:disabled) { background-color: #7c3aed; }
 
+        /* MODALS */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(4px); z-index: 1000; justify-content: center; align-items: center; }
         .modal-box { background: white; width: 420px; padding: 25px; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 1px solid #e2e8f0; }
         .modal-title { font-size: 18px; font-weight: 800; color: var(--text-main); margin-bottom: 20px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; }
@@ -254,8 +340,47 @@
             </div>
         </div>
 
-        <div class="section-title"><i class="fas fa-desktop"></i> Danh Sách Máy Tính</div>
-        <div class="pc-grid" id="pc-container">
+        <div class="main-columns">
+            
+            <div class="column-left">
+                <div class="section-title"><i class="fas fa-desktop"></i> Danh Sách Máy Tính</div>
+                <div class="pc-grid" id="pc-container"></div>
+            </div>
+
+            <div class="column-right">
+                <div class="section-title"><i class="fas fa-tv"></i> Điều Khiển Màn Hình OLED</div>
+                <div class="oled-card">
+                    <div class="form-group">
+                        <label for="oled-device-select">Chọn Thiết Bị Điều Khiển:</label>
+                        <select class="form-control" id="oled-device-select" onchange="changeOledDevice(this.value)">
+                            <option value="">-- Chọn ESP32 --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Chế độ hiển thị OLED:</label>
+                        <div class="oled-btn-group">
+                            <button class="btn-mode active" id="mode-auto" onclick="setOledMode(0)"><i class="fas fa-magic"></i> Tự Động (Lặp 15 Phút)</button>
+                            <button class="btn-mode" id="mode-info" onclick="setOledMode(1)"><i class="fas fa-info-circle"></i> Chỉ Hiện Thông Tin IP / Trạng Thái</button>
+                            <button class="btn-mode" id="mode-face" onclick="setOledMode(2)"><i class="fas fa-robot"></i> Chỉ Hiện Mặt AI Robot</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="emotion-select-container" style="display:none;">
+                        <label>Chọn biểu cảm khuôn mặt Robot:</label>
+                        <div class="emotion-grid">
+                            <button class="btn-emotion active" id="emo-0" onclick="setOledEmotion(0)"><i class="far fa-meh"></i> Bình Thường</button>
+                            <button class="btn-emotion" id="emo-1" onclick="setOledEmotion(1)"><i class="far fa-smile"></i> Vui Vẻ</button>
+                            <button class="btn-emotion" id="emo-2" onclick="setOledEmotion(2)"><i class="far fa-sad-tear"></i> Buồn Bã</button>
+                            <button class="btn-emotion" id="emo-3" onclick="setOledEmotion(3)"><i class="far fa-angry"></i> Tức Giận</button>
+                            <button class="btn-emotion" id="emo-4" onclick="setOledEmotion(4)"><i class="far fa-surprise"></i> Ngạc Nhiên</button>
+                        </div>
+                    </div>
+
+                    <button class="btn-trigger-countdown" onclick="triggerOledCountdown()"><i class="fas fa-hourglass-start"></i> Kích hoạt Đếm Ngược 3-2-1</button>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -326,6 +451,7 @@
 
         let activeMacForModal = ""; 
         let activeMacForTimer = ""; 
+        let activeMacForOled = ""; // Biến lưu MAC của ESP32 đang điều khiển OLED
         let processingMacs = {}; 
         let isSubmittingTimer = false;
         
@@ -398,6 +524,58 @@
                 }
             }
             modal.style.display = "flex";
+        }
+
+        // --- CÁC HÀM ĐIỀU KHIỂN OLED MỚI TỪ WEB ---
+        function changeOledDevice(macKey) {
+            activeMacForOled = macKey;
+            if (!macKey) return;
+            
+            db.ref('devices/' + macKey).once('value', (snapshot) => {
+                const info = snapshot.val();
+                if (info) {
+                    updateOledUI(info.oled_mode || 0, info.oled_emotion || 0);
+                }
+            });
+        }
+
+        function setOledMode(mode) {
+            if (!activeMacForOled) {
+                alert("Vui lòng chọn thiết bị điều khiển OLED trước!");
+                return;
+            }
+            db.ref('devices/' + activeMacForOled).update({ oled_mode: mode });
+        }
+
+        function setOledEmotion(emotion) {
+            if (!activeMacForOled) {
+                alert("Vui lòng chọn thiết bị điều khiển OLED trước!");
+                return;
+            }
+            db.ref('devices/' + activeMacForOled).update({ oled_emotion: emotion });
+        }
+
+        function triggerOledCountdown() {
+            if (!activeMacForOled) {
+                alert("Vui lòng chọn thiết bị điều khiển OLED trước!");
+                return;
+            }
+            db.ref('devices/' + activeMacForOled).update({ oled_trigger: 1 });
+        }
+
+        function updateOledUI(mode, emotion) {
+            // Update active state on mode buttons
+            document.getElementById('mode-auto').classList.toggle('active', mode === 0);
+            document.getElementById('mode-info').classList.toggle('active', mode === 1);
+            document.getElementById('mode-face').classList.toggle('active', mode === 2);
+            
+            // Show/Hide emotion selector
+            document.getElementById('emotion-select-container').style.display = (mode === 2) ? 'block' : 'none';
+            
+            // Update active state on emotion buttons
+            for (let i = 0; i <= 4; i++) {
+                document.getElementById('emo-' + i).classList.toggle('active', emotion === i);
+            }
         }
 
         function closeModal() {
@@ -521,6 +699,37 @@
             let htmlContent = '';
 
             if (data) {
+                // Đồng bộ cập nhật danh sách thiết bị cho dropdown OLED
+                const selectEl = document.getElementById('oled-device-select');
+                const currentSelected = selectEl.value;
+                selectEl.innerHTML = '';
+                
+                let count = 0;
+                for (const [macKey, pcInfo] of Object.entries(data)) {
+                    count++;
+                    const opt = document.createElement('option');
+                    opt.value = macKey;
+                    opt.textContent = `${pcInfo.name} (${macKey})`;
+                    selectEl.appendChild(opt);
+                }
+                
+                if (count > 0) {
+                    if (currentSelected && data[currentSelected]) {
+                        selectEl.value = currentSelected;
+                        activeMacForOled = currentSelected;
+                    } else {
+                        const firstMac = Object.keys(data)[0];
+                        selectEl.value = firstMac;
+                        activeMacForOled = firstMac;
+                    }
+                    
+                    // Đồng bộ giao diện nút OLED theo dữ liệu realtime
+                    const currentOledInfo = data[activeMacForOled];
+                    if (currentOledInfo) {
+                        updateOledUI(currentOledInfo.oled_mode || 0, currentOledInfo.oled_emotion || 0);
+                    }
+                }
+
                 for (const [macKey, pcInfo] of Object.entries(data)) {
                     const isOnline = pcInfo.status === 'online';
                     const statusClass = isOnline ? 'online' : 'offline';
